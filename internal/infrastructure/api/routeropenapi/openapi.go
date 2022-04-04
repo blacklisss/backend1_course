@@ -77,7 +77,7 @@ func (siw *ServerInterfaceWrapper) CreateLink(w http.ResponseWriter, r *http.Req
 		log.Infoln("Link created")
 
 		log.Infoln("Template create_link.html parse started")
-		tpl := template.Must(template.ParseFiles("../../templates/create_link.html"))
+		tpl := template.Must(template.ParseFiles("./templates/create_link.html"))
 		err = tpl.Execute(w, link)
 		if err != nil {
 			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "hash", Err: err})
@@ -189,7 +189,7 @@ func (siw *ServerInterfaceWrapper) GetStat(w http.ResponseWriter, r *http.Reques
 		}
 
 		log.Infoln("Parse template stat_link.html")
-		tpl := template.Must(template.ParseFiles("../../templates/stat_link.html"))
+		tpl := template.Must(template.ParseFiles("./templates/stat_link.html"))
 		err = tpl.Execute(w, link)
 		if err != nil {
 			log.Errorln(err)
@@ -209,7 +209,7 @@ func (siw *ServerInterfaceWrapper) MainPage(w http.ResponseWriter, r *http.Reque
 	ctx := r.Context()
 
 	var handler = func(w http.ResponseWriter, r *http.Request) {
-		tpl := template.Must(template.ParseFiles("../../templates/index.html"))
+		tpl := template.Must(template.ParseFiles("./templates/index.html"))
 		err := tpl.Execute(w, nil)
 		if err != nil {
 			return

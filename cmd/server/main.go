@@ -19,8 +19,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Println(os.Getwd())
-
 	ls := linkrepo.NewLinks(lst)
 	hs := handlers.NewHandlers(ls)
 
