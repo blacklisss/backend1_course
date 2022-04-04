@@ -14,7 +14,7 @@ import (
 
 func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
-	lst, err := pgstore.NewLinks(os.Getenv("PG_DSN")) // "postgres://postgres:password@localhost/test?sslmode=disable"
+	lst, err := pgstore.NewLinks(os.Getenv("DATABASE_URL"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -23,7 +23,7 @@ func main() {
 	hs := handlers.NewHandlers(ls)
 
 	h := routeropenapi.Handler(hs)
-	srv := server.NewServer(":8000", h)
+	srv := server.NewServer(":"+os.Getenv("PORT"), h)
 
 	srv.Start(ls)
 	log.Print("Start")

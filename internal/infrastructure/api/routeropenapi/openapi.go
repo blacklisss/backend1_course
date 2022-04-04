@@ -20,6 +20,7 @@ import (
 	"github.com/deepmap/oapi-codegen/pkg/runtime"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/render"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -51,11 +52,15 @@ func (siw *ServerInterfaceWrapper) CreateLink(w http.ResponseWriter, r *http.Req
 	ctx := r.Context()
 
 	ctx = context.WithValue(ctx, Api_keyScopes, []string{""})
+
+	log.Infoln("Parse Form")
 	err := r.ParseForm()
 	if err != nil {
+		log.Errorln("failed parse form")
 		panic(err)
 	}
 
+	log.Infoln("Parse PostFormValue link")
 	url := r.PostFormValue("link")
 	if ok := utils.IsURL(url); !ok {
 		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "link", Err: err})
@@ -69,13 +74,16 @@ func (siw *ServerInterfaceWrapper) CreateLink(w http.ResponseWriter, r *http.Req
 			log.Errorln(err)
 			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "hash", Err: err})
 		}
+		log.Infoln("Link created")
 
-		tpl := template.Must(template.ParseFiles("./templates/create_link.html"))
+		log.Infoln("Template create_link.html parse started")
+		tpl := template.Must(template.ParseFiles("../../templates/create_link.html"))
 		err = tpl.Execute(w, link)
 		if err != nil {
 			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "hash", Err: err})
 			return
 		}
+		log.Infoln("Template create_link.html execute")
 	}
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -103,7 +111,15 @@ func (siw *ServerInterfaceWrapper) DeleteLink(w http.ResponseWriter, r *http.Req
 	ctx = context.WithValue(ctx, Api_keyScopes, []string{""})
 
 	var handler = func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.DeleteLink(ctx, hash, r)
+		log.Infoln("Delete link")
+		link, err := siw.Handler.DeleteLink(ctx, hash, r)
+		if err != nil {
+			log.Errorln(err)
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "hash", Err: err})
+			return
+		}
+
+		render.Render(w, r, Link(link))
 	}
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -129,12 +145,15 @@ func (siw *ServerInterfaceWrapper) GetLink(w http.ResponseWriter, r *http.Reques
 	}
 
 	var handler = func(w http.ResponseWriter, r *http.Request) {
+		log.Infoln("Get link by hash:", hash)
 		link, err := siw.Handler.GetLink(ctx, hash, r)
 		if err != nil {
+			log.Errorln(err)
 			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "hash", Err: err})
 			return
 		}
 
+		log.Infoln("Redirect by ", hash, " to ", link.Link)
 		http.Redirect(w, r, link.Link, http.StatusSeeOther)
 	}
 
@@ -161,15 +180,19 @@ func (siw *ServerInterfaceWrapper) GetStat(w http.ResponseWriter, r *http.Reques
 	}
 
 	var handler = func(w http.ResponseWriter, r *http.Request) {
+		log.Infoln("Get statistic by hash ", hash)
 		link, err := siw.Handler.GetStat(ctx, hash)
 		if err != nil {
+			log.Errorln(err)
 			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "hash", Err: err})
 			return
 		}
 
-		tpl := template.Must(template.ParseFiles("./templates/stat_link.html"))
+		log.Infoln("Parse template stat_link.html")
+		tpl := template.Must(template.ParseFiles("../../templates/stat_link.html"))
 		err = tpl.Execute(w, link)
 		if err != nil {
+			log.Errorln(err)
 			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "hash", Err: err})
 			return
 		}
@@ -186,7 +209,7 @@ func (siw *ServerInterfaceWrapper) MainPage(w http.ResponseWriter, r *http.Reque
 	ctx := r.Context()
 
 	var handler = func(w http.ResponseWriter, r *http.Request) {
-		tpl := template.Must(template.ParseFiles("./templates/index.html"))
+		tpl := template.Must(template.ParseFiles("../../templates/index.html"))
 		err := tpl.Execute(w, nil)
 		if err != nil {
 			return
