@@ -1,6 +1,6 @@
-CREATE USER shortlink;
-CREATE DATABASE shortlink;
-GRANT ALL PRIVILEGES ON DATABASE shortlink TO shortlink;
+-- CREATE USER shortlink;
+-- CREATE DATABASE shortlink;
+-- GRANT ALL PRIVILEGES ON DATABASE shortlink TO shortlink;
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
