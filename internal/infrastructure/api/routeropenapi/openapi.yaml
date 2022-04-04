@@ -1,0 +1,145 @@
+openapi: 3.0.3
+info:
+  title: Short Link Service
+  version: 1.0.0
+tags:
+  - name: links
+    description: Everything about your Links
+  - name: user
+    description: Operations about user
+paths:
+  /l:
+    post:
+      tags:
+        - links
+      summary: "Add a new link to the service"
+      operationId: "CreateLink"
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                link:          # <!--- form field name
+                  type: string
+              required:
+                - link
+      responses:
+        "201":
+          description: "Link created"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Link'
+        "400":
+          description: "Invalid input"
+      security:
+        - api_key: [ ]
+  /l/{hash}:
+    get:
+      tags:
+        - link
+      summary: "Find link by hash"
+      operationId: "GetLink"
+      parameters:
+        - name: hash
+          in: path
+          description: "Hash of link to return"
+          required: true
+          schema:
+            type: string
+      responses:
+        303:
+          description: "Go to location"
+          headers:
+            Location:
+              schema:
+                type: string
+        400:
+          description: Link not found
+          content: { }
+    delete:
+      tags:
+        - link
+      summary: "Deletes a link"
+      operationId: "DeleteLink"
+      parameters:
+        - name: hash
+          in: path
+          description: "Link hash to delete"
+          required: true
+          schema:
+            type: string
+      responses:
+        400:
+          description: "Link not found"
+          content: { }
+      security:
+        - api_key: [ ]
+  /stat/{hash}:
+    get:
+      tags:
+        - link
+      summary: "Find link by hash"
+      operationId: "GetStat"
+      parameters:
+        - name: hash
+          in: path
+          description: "Hash of link to return statistic"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: "Get statistic page"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Link'
+        400:
+          description: Link not found
+          content: { }
+components:
+  schemas:
+    Link:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        hash:
+          type: string
+        adminlink:
+          type: string
+        link:
+          type: string
+        count:
+          type: integer
+          format: int64
+        ipStat:
+          type: array
+          $ref: '#/components/schemas/LinkStat'
+    LinkStat:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        ip:
+          type: number
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
