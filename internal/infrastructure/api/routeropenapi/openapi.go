@@ -74,6 +74,7 @@ func (siw *ServerInterfaceWrapper) CreateLink(w http.ResponseWriter, r *http.Req
 		if err != nil {
 			log.Errorln(err)
 			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "hash", Err: err})
+			return
 		}
 		log.Infoln("Link created")
 
