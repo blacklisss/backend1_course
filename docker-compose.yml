@@ -1,0 +1,47 @@
+version: "3.7"
+
+services:
+
+  registry:
+    image: registry:2
+    container_name: registry
+    ports:
+      - "5000:5000"
+    restart: always
+    networks:
+      - shortlinknet
+
+  postgres:
+    image: postgres:14.2
+    container_name: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - /Users/rmjv/Documents/go/src/gb/mntdata:/var/lib/postgresql/data/shortlink
+      - ./sql/init_db.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
+      PGDATA: /tmp
+    networks:
+      - shortlinknet
+
+  shortlink:
+    image: 127.0.0.1:5000/shortlink:latest
+    container_name: shortlink
+    build: .
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      PG_DSN: "postgres://postgres:password@postgres/shortlink?sslmode=disable"
+      # REGUSER_STORE: pg
+    depends_on:
+      - registry
+      - postgres
+    networks:
+      - shortlinknet
+
+networks:
+  shortlinknet:

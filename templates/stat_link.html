@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Статистика ссылки «{{ .Link }}»</title>
+</head>
+<body>
+<h1>Статистика ссылки «{{ .Link }}»</h1>
+
+<table>
+    <tr>
+        <td>Ссылка:</td>
+        <td>{{ .Link }}</td>
+    </tr>
+    <tr>
+        <td>Короткая ссылка:</td>
+        <td><a href="/l/{{ .Hash }}" target="_blank">{{ .Hash }}</a></td>
+    </tr>
+    <tr>
+        <td>Административная ссылка</td>
+        <td><a href="/stat/{{ .AdminLink }}">/stat/{{ .AdminLink }}</a></td>
+    </tr>
+    <tr>
+        <td>Количество визитов:</td>
+        <td>{{ .Count }}</td>
+    </tr>
+</table>
+
+<h2>Статистика по визитам</h2>
+<table>
+    <tr>
+        <th>IP</th>
+        <th>Дата</th>
+    </tr>
+    {{range .IPStat}}
+    <tr>
+        <td>{{ .IP }}</td>
+        <td>{{ .RequestTime }}</td>
+    </tr>
+    {{end}}
+</table>
+</body>
+</html>

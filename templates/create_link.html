@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Сервис быстрых ссылок</title>
+</head>
+<body>
+<h1>Ссылка «{{ .Link }}» создана успешно</h1>
+
+<table>
+    <tr>
+        <td>Ссылка:</td>
+        <td>{{ .Link }}</td>
+    </tr>
+    <tr>
+        <td>Короткая ссылка:</td>
+        <td><a href="/l/{{ .Hash }}" target="_blank">{{ .Hash }}</a></td>
+    </tr>
+    <tr>
+        <td>Административная ссылка</td>
+        <td><a href="/stat/{{ .AdminLink }}">/stat/{{ .AdminLink }}</a></td>
+    </tr>
+</table>
+
+
+</body>
+</html>
